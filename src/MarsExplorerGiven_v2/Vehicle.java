@@ -3,6 +3,10 @@ package MarsExplorerGiven_v2;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+/**
+ * @author Adam
+ *
+ */
 class Vehicle extends Entity {
 	public boolean carryingSample;
 
@@ -16,87 +20,61 @@ class Vehicle extends Entity {
 		actSimple(f, m, rocksCollected);
 	}
 
-	public void actCollaborative(Field f, Mothership m,
-			ArrayList<Rock> rocksCollected) {
+	public void actCollaborative(Field f, Mothership m, ArrayList<Rock> rocksCollected) {
 		// Drop the crumbs when traveling back towards the ship
 		// f.dropCrumbs(newLocation, 1);
 	}
 
 	public void actSimple(Field f, Mothership m, ArrayList<Rock> rocksCollected) {
 		System.out.println();
-		/*
-		 * Move from location to location 
-		 * TODO: extract this to a private method
-		 */
-
-		Location location = this.getLocation();
-		Location newLocation = f.freeAdjacentLocation(location);
-		f.clearLocation(location);
-		f.place(this, newLocation);
-		this.setLocation(newLocation);
-
+		//moveLocation(f, getLocation(), f.freeAdjacentLocation(location));
 		while (!carryingSample) {
-			/* 
-			 * Move around looking for rocks
-			 * Pick up rock
+			/*
+			 * Move around looking for rocks Pick up rock
 			 */
-			f.clearLocation(location);
-			f.place(this, newLocation);
-			this.setLocation(newLocation);
+			moveLocation(f, getLocation(), f.freeAdjacentLocation(getLocation()));
+
+			System.out.println("The variable's location: " + location);
+			System.out.println(f.freeAdjacentLocation(getLocation()));
 			
-			if (f.isNeighbourTo(newLocation, Rock.class)) {
+			if (f.isNeighbourTo(f.freeAdjacentLocation(getLocation()), Rock.class)) {
 				System.out.println("next to rock");
 				this.pickUpRock(f, getLocation(), rocksCollected);
 			}
 		}
 
-		while(carryingSample) {
-			f.clearLocation(location);
-			f.place(this, newLocation);
-			this.setLocation(newLocation);
-			
-			if (f.isNeighbourTo(newLocation, Obstacle.class)) {
-				System.out.println("next to obstacle");
-			} else if (f.isNeighbourTo(newLocation, Mothership.class)) {
-				System.out.println("next to mothership");
-				
-			}
-	
-		}
-
-		
-		System.out.println(location);
-		System.out.println(newLocation);
-
-		/*
-		 * Check for motherships signal Move back towards mothership Drop rock
-		 * off at mothership avoid obstacles
-		 */
 	}
 
+	/**
+	 * Get location of rock Add it to rocks collected!!!! Set carrying sample to
+	 * true
+	 * 
+	 * @param f
+	 * @param l
+	 * @param rocksCollected
+	 */
 	private void pickUpRock(Field f, Location l, ArrayList<Rock> rocksCollected) {
-		// check if object at current location is a rock
-		if (f.getObjectAt(l) instanceof Rock) {
-			Rock e = (Rock) f.getObjectAt(l);
-			// Add it to rocks collected!!!!
-			rocksCollected.add(e);
-			// set carrying sample to true
-			setCarryingSample(true);
-		}
+		System.out.println("Get here?");
+		Location rockLocation = f.getNeighbour(l, Rock.class);
+		Rock rock = (Rock) f.getObjectAt(rockLocation);
+		System.out.println("Am picking up => " + rock);
+		rocksCollected.add(rock);
+		setCarryingSample(true);
 	}
 	
+	/**
+	 * @param bool
+	 */
 	private void setCarryingSample(Boolean bool) {
 		this.carryingSample = bool;
 	}
 	
-	private void dropRockSample(Field f, Location l, ArrayList<Rock> rocksCollected) {
-		if (f.getObjectAt(l) instanceof Mothership) {
-			
-			// Drop rock collected
-			System.out.println("Dropping off rock" + rocksCollected.get(0));
-			Rock rock = rocksCollected.get(0);
-			// set carrying sample to true
-			setCarryingSample(false);
-		}
+	/*
+	 * Move around the map
+	 */
+	private void moveLocation(Field f, Location location, Location newLocation) {
+		f.clearLocation(location);
+		f.place(this, newLocation);
+		this.setLocation(newLocation);
 	}
 }
