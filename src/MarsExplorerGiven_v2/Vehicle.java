@@ -9,15 +9,16 @@ import java.util.Iterator;
  */
 class Vehicle extends Entity {
 	public boolean carryingSample;
+	private Rock carriedRock;
 
 	public Vehicle(Location l) {
 		super(l);
 		this.carryingSample = false;
 	}
 
-	public void act(Field f, Mothership m, ArrayList<Rock> rocksCollected) {
+	public void act(Field f, Mothership m, ArrayList<Rock> rocksToRemove) {
 		// actCollaborative(f,m,rocksCollected);
-		actSimple(f, m, rocksCollected);
+		actSimple(f, m, rocksToRemove);
 	}
 
 	public void actCollaborative(Field f, Mothership m,
@@ -26,10 +27,9 @@ class Vehicle extends Entity {
 		// f.dropCrumbs(newLocation, 1);
 	}
 
-	public void actSimple(Field f, Mothership m, ArrayList<Rock> rocksCollected) {
-		System.out.println();
+	public void actSimple(Field f, Mothership m, ArrayList<Rock> rocksToRemove) {
 		// moveLocation(f, getLocation(), f.freeAdjacentLocation(location));
-		while (!carryingSample) {
+		if (!carryingSample) {
 			/*
 			 * Move around looking for rocks Pick up rock
 			 */
@@ -37,18 +37,16 @@ class Vehicle extends Entity {
 
 			if (f.isNeighbourTo(getLocation(), Rock.class)) {
 				System.out.println("next to rock");
-				this.pickUpRock(f, getLocation(), rocksCollected);
+				this.pickUpRock(f, getLocation(), rocksToRemove);
 			}
 			moveLocation(f, getLocation(), nextLocation);
-		}
-
-		while (carryingSample) {
+		} else {
 			Location nextLocation = f.freeAdjacentLocation(getLocation());
 			System.out.println("Next Location: " + nextLocation);
 
 			if (f.isNeighbourTo(getLocation(), Mothership.class)) {
 				System.out.println("next to mothership");
-				this.dropRockSample(f, getLocation(), rocksCollected);
+				this.dropRockSample(f, getLocation());
 			}
 			moveLocation(f, getLocation(), nextLocation);
 		}
@@ -61,13 +59,14 @@ class Vehicle extends Entity {
 	 * 
 	 * @param f
 	 * @param l
-	 * @param rocksCollected
+	 * @param rocksToRemove
 	 */
-	private void pickUpRock(Field f, Location l, ArrayList<Rock> rocksCollected) {
+	private void pickUpRock(Field f, Location l, ArrayList<Rock> rocksToRemove) {
 		Location rockLocation = f.getNeighbour(l, Rock.class);
 		Rock rock = (Rock) f.getObjectAt(rockLocation);
-		System.out.println("Am picking up => " + rock);
-		rocksCollected.add(rock);
+		System.out.println(this.toString() + " picking up => " + rock);
+		carriedRock = rock;
+		rocksToRemove.add(rock);
 		setCarryingSample(true);
 	}
 
@@ -94,13 +93,12 @@ class Vehicle extends Entity {
 	 * @param l
 	 * @param rocksCollected
 	 */
-	private void dropRockSample(Field f, Location l, ArrayList<Rock> rocksCollected) {
-		Rock rock = rocksCollected.get(0);
+	private void dropRockSample(Field f, Location l) {
 		Location motherShipLocation = f.getNeighbour(l, Mothership.class);
-		rocksCollected.remove(0);
-		System.out.println("Dropping off rock sample: " + rock);
+		System.out.println("Dropping off rock sample: " + carriedRock);
 		System.out.println("At mothership in: " + motherShipLocation);
-		f.place(rock, motherShipLocation);
+		f.place(carriedRock, motherShipLocation);
+		carriedRock = null;
 		setCarryingSample(false);
 	}
 }

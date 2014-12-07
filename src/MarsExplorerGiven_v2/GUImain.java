@@ -298,6 +298,7 @@ public class GUImain {
 			JOptionPane.showMessageDialog(mainFrame, 
 					"Problem running simulation." +
 					e.getMessage());
+			throw e;
 		}			
 	}
 	

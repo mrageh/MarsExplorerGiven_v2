@@ -103,7 +103,7 @@ public class Simulator
    		
        for(Iterator<Rock> it = rocksToRemove.iterator(); it.hasNext(); ) {
        		Rock r = it.next();
-       		//tempField.clearLocation(r.getLocation());
+       		tempField.clearLocation(r.getLocation());
        		rocks.remove(r);
        }
               
@@ -203,7 +203,7 @@ public class Simulator
     
     public static void main(String[] args){
     	Simulator s = new Simulator();
-		//s.randomLandMothership();
+//		s.randomLandMothership();
 		s.simulate(11000);
 		
     }
